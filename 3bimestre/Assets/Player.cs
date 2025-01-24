@@ -4,24 +4,26 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float velocidade = 10f;  // Velocidade de movimentação
-    public float focaPulo = 10f;   // Força do pulo
-    private bool noChao = false;   // Verifica se o jogador está no chão
+    public float velocidade = 10f;
+    public float focaPulo = 10f;
+
+    public bool noChao = false;
+  
 
     private Rigidbody2D _rigidbody2D;
-    private SpriteRenderer spriteRenderer;
+    private SpriteRenderer  spriteRenderer; 
 
     // Start is called before the first frame update
     void Start()
     {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        _rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
+        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
     }
+
 
     void OnCollisionStay2D(Collision2D collision)
     {
-        // Verifica se o jogador está colidindo com o chão
-        if (collision.gameObject.CompareTag("chao"))
+        if (collision.gameObject.tag == "chao")
         {
             noChao = true;
         }
@@ -29,35 +31,41 @@ public class Player : MonoBehaviour
 
     void OnCollisionExit2D(Collision2D collision)
     {
-        // Define que o jogador não está mais no chão
-        if (collision.gameObject.CompareTag("chao"))
+        if (collision.gameObject.tag == "chao")
         {
             noChao = false;
         }
     }
 
-    // Update é chamado uma vez por frame
+    // Update is called once per frame
     void Update()
     {
-        // Movimentação para a esquerda
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if(Input.GetKey(KeyCode.LeftArrow))
         {
-            transform.position += new Vector3(-velocidade * Time.deltaTime, 0, 0);
+            gameObject.transform.position += new Vector3(-velocidade*Time.deltaTime,0,0);
+            //rigidbody2D.AddForce(new Vector2(-velocidade,0));
             spriteRenderer.flipX = true;
+            Debug.Log("LeftArrow");
         }
+        
 
-        // Movimentação para a direita
-        if (Input.GetKey(KeyCode.RightArrow))
+        if(Input.GetKey(KeyCode.RightArrow))
         {
-            transform.position += new Vector3(velocidade * Time.deltaTime, 0, 0);
+            gameObject.transform.position += new Vector3(velocidade*Time.deltaTime,0,0);
+            //rigidbody2D.AddForce(new Vector2(velocidade,0));
             spriteRenderer.flipX = false;
+            Debug.Log("RightArrow");
         }
 
-        // Pular
-        if (Input.GetKeyDown(KeyCode.Space) && noChao)
+        if (Input.GetKeyDown(KeyCode.Space) && noChao == true)
         {
-            _rigidbody2D.AddForce(Vector2.up * focaPulo, ForceMode2D.Impulse);
-            noChao = false; // Impede pular novamente até tocar o chão
+            _rigidbody2D.AddForce(new Vector2(0, 1) * focaPulo,ForceMode2D.Impulse);
+
+            Debug.Log("Jump");
         }
+
+     
+
+
     }
 }
