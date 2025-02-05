@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - noChao
+  - chao
   layers:
   - Default
   - TransparentFX
