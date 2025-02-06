@@ -1,63 +1,69 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float velocidadeDoJogador;
-    public float alturaDoPulo;
-
-    public Rigidbody2D oRigifbody2D;
+    public float velocidade = 10f;
+    public float focaPulo = 10f;
+    public bool noChao = false;
     
-    public SpriteRenderer OSpriteRenderer;
-    public AudioSource somDoPulo;
+    private Rigidbody2D _rigidbody2D;
+    private SpriteRenderer spriteRenderer;
+    private AudioSource audioSource;
+    
+    public AudioClip somPulo; // Arraste o som de pulo no Inspector
 
-    public bool estaNoChao;
-    public Transform verficadorDeChao;
-    public float raioDeVerificacao;
-    public LayerMask layerDoChao;
+    // Start is called before the first frame update
     void Start()
     {
-        
+        _rigidbody2D = gameObject.GetComponent<Rigidbody2D>();
+        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        audioSource = gameObject.GetComponent<AudioSource>();
     }
 
-    
+    void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "chao")
+        {
+            noChao = true;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "chao")
+        {
+            noChao = false;
+        }
+    }
+
+    // Update is called once per frame
     void Update()
     {
-        
-    }
-
-    void FixedUpdate()
-    {
-        MovimentarJogador();
-        pular();
-    }
-
-
-    public void MovimentarJogador()
-    {
-        float inputDoMovimento = Input.GetAxisRaw("Horizontal");
-        oRigifbody2D.velocity = new Vector2(inputDoMovimento * velocidadeDoJogador, oRigifbody2D.velocity.y);
-        if (inputDoMovimento > 0)
+        if (Input.GetKey(KeyCode.LeftArrow))
         {
-            OSpriteRenderer.flipX = false;
+            gameObject.transform.position += new Vector3(-velocidade * Time.deltaTime, 0, 0);
+            spriteRenderer.flipX = true;
+            Debug.Log("LeftArrow");
         }
 
-        if (inputDoMovimento < 0)
+        if (Input.GetKey(KeyCode.RightArrow))
         {
-            OSpriteRenderer.flipX = true;
+            gameObject.transform.position += new Vector3(velocidade * Time.deltaTime, 0, 0);
+            spriteRenderer.flipX = false;
+            Debug.Log("RightArrow");
         }
-    }
 
-    public void pular()
-    {
-        estaNoChao = Physics2D.OverlapCircle(verficadorDeChao.position, raioDeVerificacao, layerDoChao);
-
-        if (Input.GetKeyDown(KeyCode.Space) && estaNoChao == true)
+        if (Input.GetKeyDown(KeyCode.Space) && noChao == true)
         {
-            oRigifbody2D.velocity = Vector2.up * alturaDoPulo;
-            somDoPulo.Play();
+            _rigidbody2D.AddForce(new Vector2(0, 1) * focaPulo, ForceMode2D.Impulse);
+            Debug.Log("Jump");
+            
+            if (somPulo != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(somPulo);
+            }
         }
     }
 }
